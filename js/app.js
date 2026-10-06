@@ -158,7 +158,7 @@
     $$(".switch-btn").forEach((b) => b.classList.toggle("active", b.dataset.variant === state.variant));
     $("#mode-combo").classList.toggle("hidden", state.mode !== "combo");
     $("#mode-classic").classList.toggle("hidden", state.mode !== "classic");
-    $("#puzzle-label").textContent = state.variant === "daily" ? `Reto diario #${TODAY}` : "Modo práctica ♾️";
+    $$(".puzzle-label").forEach((el) => { el.textContent = state.variant === "daily" ? `#${TODAY}` : "♾️ Práctica"; });
     if (state.mode === "combo") renderCombo();
     else renderClassic();
     renderResult();
@@ -215,8 +215,7 @@
       board.appendChild(row);
     }
 
-    $("#combo-composer").classList.toggle("hidden", state.done);
-    $("#vkeyboard").classList.toggle("hidden", state.done);
+    $("#combo-input").classList.toggle("hidden", state.done);
     $("#mode-combo .tiny-note").classList.toggle("hidden", state.done);
     renderStaging();
     paintKeyboard();
@@ -226,7 +225,7 @@
     const st = $("#combo-staging");
     st.innerHTML = state.staged.length
       ? comboHTML(state.staged)
-      : '<span class="staging-empty">Pulsa la combinación en tu teclado o usa las teclas de abajo</span>';
+      : '<span class="staging-empty">Pulsa la combinación o usa el teclado de abajo</span>';
     $("#combo-submit").disabled = !state.staged.length;
     $$(".vkey").forEach((b) => b.classList.toggle("selected", state.staged.includes(b.dataset.key)));
   }

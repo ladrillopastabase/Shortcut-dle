@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shortcut-dle</title>
-  <meta name="description" content="Adivina el atajo de teclado del día. Un juego estilo Wordle / Pokedle sobre atajos de teclado.">
+  <meta name="description" content="Adivina el atajo de teclado del día. Un juego diario sobre atajos de teclado.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,20 +25,12 @@
     </div>
   </header>
 
-  <nav class="modes" role="tablist">
-    <button class="mode-tab active" data-mode="combo" role="tab">
-      <span class="mode-emoji">⌨️</span>
-      <span><b>Combo</b><small>Teclea el atajo</small></span>
-    </button>
-    <button class="mode-tab" data-mode="classic" role="tab">
-      <span class="mode-emoji">🔎</span>
-      <span><b>Clásico</b><small>Adivina por pistas</small></span>
-    </button>
-  </nav>
-
-  <div class="subbar">
-    <div class="pill" id="puzzle-label">Reto diario #1</div>
-    <div class="switch">
+  <div class="controls">
+    <div class="seg" role="tablist">
+      <button class="mode-tab active" data-mode="combo" role="tab">⌨️ Combo</button>
+      <button class="mode-tab" data-mode="classic" role="tab">🔎 Clásico</button>
+    </div>
+    <div class="seg seg--alt">
       <button class="switch-btn active" data-variant="daily">📅 Diario</button>
       <button class="switch-btn" data-variant="practice">♾️ Práctica</button>
     </div>
@@ -48,7 +40,7 @@
     <!-- ======== MODO COMBO ======== -->
     <section id="mode-combo" class="mode-panel">
       <div class="card prompt-card">
-        <div class="prompt-app" id="combo-app"></div>
+        <div class="prompt-top"><span class="pill puzzle-label"></span><div class="prompt-app" id="combo-app"></div></div>
         <p class="prompt-label">¿Qué atajo sirve para…</p>
         <h2 class="prompt-action" id="combo-action"></h2>
         <div class="hints" id="combo-hints"></div>
@@ -56,9 +48,10 @@
 
       <div class="board" id="combo-board"></div>
 
-      <div class="composer card" id="combo-composer">
+      <div class="kb-card card" id="combo-input">
+      <div class="composer" id="combo-composer">
         <div class="staging" id="combo-staging">
-          <span class="staging-empty">Pulsa la combinación en tu teclado o usa las teclas de abajo</span>
+          <span class="staging-empty">Pulsa la combinación o usa el teclado de abajo</span>
         </div>
         <div class="composer-actions">
           <button class="btn btn-ghost" id="combo-clear">Borrar</button>
@@ -67,12 +60,14 @@
       </div>
 
       <div class="vkeyboard" id="vkeyboard"></div>
+      </div>
       <p class="tiny-note">💡 Enter envía · Retroceso borra · En Mac, <kbd>⌘</kbd> cuenta como <kbd>Ctrl</kbd>. Algunos atajos del navegador (como Ctrl+W) no se pueden capturar: usa el teclado en pantalla.</p>
     </section>
 
     <!-- ======== MODO CLÁSICO ======== -->
     <section id="mode-classic" class="mode-panel hidden">
       <div class="card prompt-card">
+        <div class="prompt-top"><span class="pill puzzle-label"></span></div>
         <p class="prompt-label">Adivina el atajo misterioso</p>
         <h2 class="prompt-action mystery">¿ <span class="mystery-keys"><kbd>?</kbd>+<kbd>?</kbd></span> ?</h2>
         <p class="prompt-sub">Escribe una acción, app o combinación y compara sus atributos.</p>
@@ -114,7 +109,7 @@
   </main>
 
   <footer class="foot">
-    Hecho con <span class="heart">♥</span> y muchos <kbd>Ctrl</kbd>+<kbd>Z</kbd> · Inspirado en Pokedle y los juegos "‑dle"
+    Hecho con <span class="heart">♥</span> y muchos <kbd>Ctrl</kbd>+<kbd>Z</kbd>
   </footer>
 
   <!-- ======== MODALES ======== -->
@@ -134,7 +129,7 @@
         <span class="count-chip up">3 ⬆️</span><span>El atajo tiene más teclas que tu intento.</span>
       </div>
       <h3>🔎 Clásico</h3>
-      <p>Como en Pokedle: adivina un atajo misterioso. Cada intento compara la <b>app</b>, la <b>categoría</b>, los <b>modificadores</b>, el <b>número de teclas</b> y la <b>tecla final</b>.</p>
+      <p>Adivina un atajo misterioso. Cada intento compara la <b>app</b>, la <b>categoría</b>, los <b>modificadores</b>, el <b>número de teclas</b> y la <b>tecla final</b>.</p>
       <p>🟨 en modificadores = comparten alguno. 🟨 en tecla final = mismo tipo (letra, número, F‑tecla, flecha…); si son letras o números, ⬆️⬇️ indica si la respuesta va después o antes.</p>
       <h3>📅 Diario y ♾️ Práctica</h3>
       <p>Hay un reto nuevo cada día para cada modo. En Práctica puedes jugar sin límite.</p>
