@@ -133,16 +133,17 @@ kbd {
   background: var(--yellow);
   color: #1b1530;
   border: 3px solid var(--ink);
-  border-bottom-width: 6px;
   border-radius: 10px;
+  box-shadow: 0 3px 0 var(--ink);
   transform: rotate(-3deg);
   animation: logo-press 4s ease-in-out infinite;
 }
 .logo-key--accent { background: var(--accent); color: #fff; transform: rotate(3deg); animation-delay: .25s; }
 .logo-plus { font-family: var(--mono); color: var(--primary); }
 @keyframes logo-press {
-  0%, 86%, 100% { border-bottom-width: 6px; translate: 0 0; }
-  90% { border-bottom-width: 3px; translate: 0 3px; }
+  /* Solo transform y sombra: no cambia el tamaño, así no mueve el resto de la página */
+  0%, 86%, 100% { translate: 0 0; box-shadow: 0 3px 0 var(--ink); }
+  90% { translate: 0 3px; box-shadow: 0 0 0 var(--ink); }
 }
 
 /* ---------- controles (modo + variante) ---------- */
