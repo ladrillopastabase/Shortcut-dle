@@ -9,7 +9,9 @@
   --accent: #ff5da2;
   --yellow: #ffd23f;
   --ok: #2bd67b;
-  --part: #ffc43d;
+  --part: #ffd84d;
+  --hot: #ff9b3d;
+  --tepid: #ffb3a1;
   --bad: #ff6b6b;
   --none: #d9d4e6;
   --key: #fffaf0;
@@ -503,6 +505,8 @@ main { max-width: var(--w); margin: 0 auto; }
 .cell small { font-size: 10px; font-weight: 600; opacity: .8; }
 .cell.ok { background: var(--ok); color: #10301e; }
 .cell.part { background: var(--part); color: #3b2a00; }
+.cell.hot { background: var(--hot); color: #3a1a00; }
+.cell.tepid { background: var(--tepid); color: #3a0d0d; }
 .cell.bad { background: var(--bad); color: #3a0d0d; }
 .cell kbd { color: var(--ink); background: #fffaf0; }
 
@@ -526,6 +530,8 @@ main { max-width: var(--w); margin: 0 auto; }
 }
 .sw-ok { background: var(--ok); }
 .sw-part { background: var(--part); }
+.sw-hot { background: var(--hot); }
+.sw-tepid { background: var(--tepid); }
 .sw-bad { background: var(--bad); }
 
 /* ---------- resultado ---------- */

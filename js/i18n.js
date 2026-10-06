@@ -40,16 +40,15 @@ const I18N = {
     "col.final": "Tecla final",
     "mods.none": "Ninguno",
     "legend.ok": "Correcto",
-    "legend.part": "Parcial",
+    "legend.part": "Parcial / cerca",
+    "legend.hot": "Muy cerca",
+    "heat.hot": "🔥 Muy cerca",
+    "heat.warm": "♨️ Cerca",
+    "heat.tepid": "🌡️ Tibio",
+    "legend.tepid": "Tibio",
+    "heat.cold": "🧊 Lejos",
     "legend.bad": "Incorrecto",
     "legend.arrows": "⬆️⬇️ más / menos",
-    "type.letter": "letra",
-    "type.number": "número",
-    "type.fkey": "tecla F",
-    "type.arrow": "flecha",
-    "type.modifier": "modificador",
-    "type.symbol": "símbolo",
-    "type.special": "especial",
     "result.wins": ["¡Maestro del teclado!", "¡Dedos de oro!", "¡Combo perfecto!", "¡Lo lograste!", "¡Bien jugado!", "¡Por los pelos!"],
     "result.classicGreat": "¡Increíble!",
     "result.classicWin": "¡Lo encontraste!",
@@ -82,7 +81,8 @@ const I18N = {
       <div class="help-row"><span class="count-chip up">⬆️</span><span>El atajo tiene más teclas que tu intento.</span></div>
       <h3>🔎 Clásico</h3>
       <p>Adivina un atajo misterioso. Cada intento compara la <b>app</b>, la <b>categoría</b>, los <b>modificadores</b>, el <b>número de teclas</b> y la <b>tecla final</b>.</p>
-      <p>🟨 en modificadores = comparten alguno. 🟨 en tecla final = mismo tipo (letra, número, F‑tecla, flecha…); si son letras o números, ⬆️⬇️ indica si la respuesta va después o antes.</p>
+      <p>🟨 en modificadores = comparten alguno.</p>
+      <p>La <b>tecla final</b> te dice qué tan cerca está en el teclado: 🟧 <b>muy cerca</b> (tecla vecina), 🟨 <b>cerca</b> (a 2–3 teclas), 🟫 <b>tibio</b> (a 4–5 teclas) o 🟥 <b>lejos</b>. La flecha (↗️, ⬅️…) apunta hacia dónde está la respuesta.</p>
       <h3>📅 Diario y ♾️ Práctica</h3>
       <p>Hay un reto nuevo cada día para cada modo. En Práctica puedes jugar sin límite.</p>
       <p class="tiny-note">Los atajos usan la convención de Windows/Linux. En Mac, <kbd>⌘</kbd> = <kbd>Ctrl</kbd> y <kbd>⌥</kbd> = <kbd>Alt</kbd>.</p>`,
@@ -125,16 +125,15 @@ const I18N = {
     "col.final": "Final key",
     "mods.none": "None",
     "legend.ok": "Correct",
-    "legend.part": "Partial",
+    "legend.part": "Partial / close",
+    "legend.hot": "Very close",
+    "heat.hot": "🔥 Very close",
+    "heat.warm": "♨️ Close",
+    "heat.tepid": "🌡️ Lukewarm",
+    "legend.tepid": "Lukewarm",
+    "heat.cold": "🧊 Far",
     "legend.bad": "Wrong",
     "legend.arrows": "⬆️⬇️ more / less",
-    "type.letter": "letter",
-    "type.number": "number",
-    "type.fkey": "F key",
-    "type.arrow": "arrow",
-    "type.modifier": "modifier",
-    "type.symbol": "symbol",
-    "type.special": "special",
     "result.wins": ["Keyboard master!", "Golden fingers!", "Perfect combo!", "You got it!", "Well played!", "Phew, close one!"],
     "result.classicGreat": "Amazing!",
     "result.classicWin": "You found it!",
@@ -167,7 +166,8 @@ const I18N = {
       <div class="help-row"><span class="count-chip up">⬆️</span><span>The shortcut has more keys than your guess.</span></div>
       <h3>🔎 Classic</h3>
       <p>Guess a mystery shortcut. Each guess compares the <b>app</b>, <b>category</b>, <b>modifiers</b>, <b>number of keys</b> and <b>final key</b>.</p>
-      <p>🟨 on modifiers = some in common. 🟨 on final key = same type (letter, number, F key, arrow…); for letters or numbers, ⬆️⬇️ tells you whether the answer comes after or before.</p>
+      <p>🟨 on modifiers = some in common.</p>
+      <p>The <b>final key</b> tells you how close it is on the keyboard: 🟧 <b>very close</b> (neighbouring key), 🟨 <b>close</b> (2–3 keys away), 🟫 <b>lukewarm</b> (4–5 keys away) or 🟥 <b>far</b>. The arrow (↗️, ⬅️…) points to where the answer is.</p>
       <h3>📅 Daily and ♾️ Practice</h3>
       <p>There's a new puzzle every day for each mode. In Practice you can play as much as you want.</p>
       <p class="tiny-note">Shortcuts use the Windows/Linux convention. On Mac, <kbd>⌘</kbd> = <kbd>Ctrl</kbd> and <kbd>⌥</kbd> = <kbd>Alt</kbd>.</p>`,

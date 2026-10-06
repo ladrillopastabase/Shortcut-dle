@@ -70,15 +70,6 @@
   };
   const label = (k) => DISPLAY[LANG][k] || k;
   const sameSet = (a, b) => a.length === b.length && a.every((k) => b.includes(k));
-  const keyType = (k) => {
-    if (/^[A-Z]$/.test(k)) return "letter";
-    if (/^[0-9]$/.test(k)) return "number";
-    if (/^F\d+$/.test(k)) return "fkey";
-    if ("↑↓←→".includes(k)) return "arrow";
-    if (isMod(k)) return "modifier";
-    if (k.length === 1) return "symbol";
-    return "special";
-  };
   const finalKey = (keys) => keys[keys.length - 1];
 
   SHORTCUTS.forEach((s) => {
@@ -369,21 +360,45 @@
   }
 
   // ================= MODO CLÁSICO =================
+  // Posición física aproximada de cada tecla (x = columna, y = fila) en un teclado QWERTY.
+  const KEY_POS = (() => {
+    const pos = { Esc: [0, 0], PrtSc: [15, 0], "`": [0, 1], Backspace: [13.5, 1], Tab: [0.25, 2], Enter: [13.25, 3],
+      Shift: [0.5, 4], Ctrl: [0.5, 5], Win: [1.75, 5], Alt: [3, 5], Space: [6.5, 5],
+      Home: [16, 1], PgUp: [17, 1], Delete: [15, 2], End: [16, 2], PgDn: [17, 2],
+      "↑": [16, 4], "←": [15, 5], "↓": [16, 5], "→": [17, 5] };
+    [2, 3, 4, 5, 6.5, 7.5, 8.5, 9.5, 11, 12, 13, 14].forEach((x, i) => { pos["F" + (i + 1)] = [x, 0]; });
+    [["1234567890-=", 1, 1], ["QWERTYUIOP[]\\", 1.5, 2], ["ASDFGHJKL;'", 1.75, 3], ["ZXCVBNM,./", 2.25, 4]]
+      .forEach(([row, x0, y]) => [...row].forEach((k, i) => { pos[k] = [x0 + i, y]; }));
+    return pos;
+  })();
+  const DIR_ARROWS = ["➡️", "↘️", "⬇️", "↙️", "⬅️", "↖️", "⬆️", "↗️"];
+  function keyProximity(guess, answer) {
+    if (guess === answer) return { st: "ok", heat: "", dir: "" };
+    const p = KEY_POS[guess], q = KEY_POS[answer];
+    if (!p || !q) return { st: "bad", heat: "cold", dir: "" };
+    const dx = q[0] - p[0], dy = q[1] - p[1];
+    const d = Math.hypot(dx, dy);
+    const dir = DIR_ARROWS[((Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) % 8) + 8) % 8];
+    if (d <= 1.6) return { st: "hot", heat: "hot", dir };
+    if (d <= 3.2) return { st: "part", heat: "warm", dir };
+    if (d <= 5.2) return { st: "tepid", heat: "tepid", dir };
+    return { st: "bad", heat: "cold", dir };
+  }
+
   function compareClassic(g, a) {
     const gm = g.keys.filter(isMod), am = a.keys.filter(isMod);
     const inter = gm.filter((m) => am.includes(m));
     const gf = finalKey(g.keys), af = finalKey(a.keys);
-    let finalSt = gf === af ? "ok" : keyType(gf) === keyType(af) ? "part" : "bad";
-    let finalArrow = "";
-    if (finalSt === "part" && ["letter", "number"].includes(keyType(gf))) finalArrow = af > gf ? "⬆️" : "⬇️";
+    const prox = keyProximity(gf, af);
     return {
       app: g.app === a.app ? "ok" : "bad",
       cat: APPS[g.app].cat === APPS[a.app].cat ? "ok" : "bad",
       mods: sameSet(gm, am) ? "ok" : inter.length ? "part" : "bad",
       count: g.keys.length === a.keys.length ? "ok" : "bad",
       countArrow: g.keys.length === a.keys.length ? "" : a.keys.length > g.keys.length ? "⬆️" : "⬇️",
-      final: finalSt,
-      finalArrow,
+      final: prox.st,
+      finalHeat: prox.heat,
+      finalDir: prox.dir,
     };
   }
 
@@ -416,7 +431,7 @@
         `<div class="cell ${c.cat}">${esc(appCat(g.app))}</div>`,
         `<div class="cell ${c.mods}">${mods.length ? mods.map(label).join(" + ") : t("mods.none")}</div>`,
         `<div class="cell ${c.count}"><span class="big">${g.keys.length}</span><span class="arrow">${c.countArrow}</span></div>`,
-        `<div class="cell ${c.final}"><kbd>${esc(label(finalKey(g.keys)))}</kbd><small>${esc(t("type." + keyType(finalKey(g.keys))))}</small><span class="arrow">${c.finalArrow}</span></div>`,
+        `<div class="cell ${c.final}"><kbd>${esc(label(finalKey(g.keys)))}</kbd>${c.finalHeat ? `<small>${esc(t("heat." + c.finalHeat))}</small>` : ""}<span class="arrow">${c.finalDir}</span></div>`,
       ];
       row.innerHTML = cells.join("");
       $$(".cell", row).forEach((cell, j) => {
@@ -544,7 +559,7 @@
       state.guesses.forEach((g) => lines.push(comboFeedback(g, a).map((x) => (x === "ok" ? "🟩" : "🟥")).join("")));
     } else {
       lines = [`Shortcut-dle 🔎 ${t("share.classic")} ${tag} — ${t("share.tries", { n })}`];
-      const em = { ok: "🟩", part: "🟨", bad: "🟥" };
+      const em = { ok: "🟩", hot: "🟧", part: "🟨", tepid: "🟫", bad: "🟥" };
       state.guesses.slice(-6).forEach((id) => {
         const c = compareClassic(SHORTCUTS[id], a);
         lines.push([c.app, c.cat, c.mods, c.count, c.final].map((x) => em[x]).join(""));
