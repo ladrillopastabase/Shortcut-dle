@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shortcut-dle</title>
-  <meta name="description" content="Adivina el atajo de teclado del día. Un juego diario sobre atajos de teclado.">
+  <meta name="description" data-i18n-content="meta.desc" content="Adivina el atajo de teclado del día. Un juego diario sobre atajos de teclado.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,24 +15,25 @@
   <div class="bg-keys" aria-hidden="true"></div>
 
   <header class="topbar">
-    <button class="icon-btn" id="btn-help" title="Cómo jugar" aria-label="Cómo jugar">?</button>
+    <button class="icon-btn" id="btn-help" data-i18n-title="btn.help">?</button>
     <h1 class="logo">
       <span class="logo-key">Shortcut</span><span class="logo-plus">+</span><span class="logo-key logo-key--accent">dle</span>
     </h1>
     <div class="topbar-right">
-      <button class="icon-btn" id="btn-stats" title="Estadísticas" aria-label="Estadísticas">📈</button>
-      <button class="icon-btn" id="btn-theme" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+      <button class="icon-btn" id="btn-lang" data-i18n-title="btn.lang">EN</button>
+      <button class="icon-btn" id="btn-stats" data-i18n-title="btn.stats">📈</button>
+      <button class="icon-btn" id="btn-theme" data-i18n-title="btn.theme">🌙</button>
     </div>
   </header>
 
   <div class="controls">
     <div class="seg" role="tablist">
-      <button class="mode-tab active" data-mode="combo" role="tab">⌨️ Combo</button>
-      <button class="mode-tab" data-mode="classic" role="tab">🔎 Clásico</button>
+      <button class="mode-tab active" data-mode="combo" role="tab" data-i18n="mode.combo">⌨️ Combo</button>
+      <button class="mode-tab" data-mode="classic" role="tab" data-i18n="mode.classic">🔎 Clásico</button>
     </div>
     <div class="seg seg--alt">
-      <button class="switch-btn active" data-variant="daily">📅 Diario</button>
-      <button class="switch-btn" data-variant="practice">♾️ Práctica</button>
+      <button class="switch-btn active" data-variant="daily" data-i18n="variant.daily">📅 Diario</button>
+      <button class="switch-btn" data-variant="practice" data-i18n="variant.practice">♾️ Práctica</button>
     </div>
   </div>
 
@@ -41,7 +42,7 @@
     <section id="mode-combo" class="mode-panel">
       <div class="card prompt-card">
         <div class="prompt-top"><span class="pill puzzle-label"></span><div class="prompt-app" id="combo-app"></div></div>
-        <p class="prompt-label">¿Qué atajo sirve para…</p>
+        <p class="prompt-label" data-i18n="combo.question">¿Qué atajo sirve para…</p>
         <h2 class="prompt-action" id="combo-action"></h2>
         <div class="hints" id="combo-hints"></div>
       </div>
@@ -54,43 +55,43 @@
           <span class="staging-empty">Pulsa la combinación o usa el teclado de abajo</span>
         </div>
         <div class="composer-actions">
-          <button class="btn btn-ghost" id="combo-clear">Borrar</button>
-          <button class="btn btn-primary" id="combo-submit">Probar ⏎</button>
+          <button class="btn btn-ghost" id="combo-clear" data-i18n="combo.clear">Borrar</button>
+          <button class="btn btn-primary" id="combo-submit" data-i18n="combo.submit">Probar ⏎</button>
         </div>
       </div>
 
       <div class="vkeyboard" id="vkeyboard"></div>
       </div>
-      <p class="tiny-note">💡 Enter envía · Retroceso borra · En Mac, <kbd>⌘</kbd> cuenta como <kbd>Ctrl</kbd>. Algunos atajos del navegador (como Ctrl+W) no se pueden capturar: usa el teclado en pantalla.</p>
+      <p class="tiny-note" data-i18n="combo.note">💡 Enter envía · Retroceso borra · En Mac, <kbd>⌘</kbd> cuenta como <kbd>Ctrl</kbd>. Algunos atajos del navegador (como Ctrl+W) no se pueden capturar: usa el teclado en pantalla.</p>
     </section>
 
     <!-- ======== MODO CLÁSICO ======== -->
     <section id="mode-classic" class="mode-panel hidden">
       <div class="card prompt-card">
         <div class="prompt-top"><span class="pill puzzle-label"></span></div>
-        <p class="prompt-label">Adivina el atajo misterioso</p>
-        <h2 class="prompt-action mystery">¿ <span class="mystery-keys"><kbd>?</kbd>+<kbd>?</kbd></span> ?</h2>
-        <p class="prompt-sub">Escribe una acción, app o combinación y compara sus atributos.</p>
+        <p class="prompt-label" data-i18n="classic.title">Adivina el atajo misterioso</p>
+        <h2 class="prompt-action mystery"><span class="mystery-keys"><kbd>?</kbd>+<kbd>?</kbd>+<kbd>?</kbd></span></h2>
+        <p class="prompt-sub" data-i18n="classic.sub">Escribe una acción, app o combinación y compara sus atributos.</p>
         <div class="hints" id="classic-hints"></div>
       </div>
 
       <div class="search card" id="classic-search">
-        <input type="text" id="classic-input" placeholder="Ej: copiar, VS Code, Ctrl+Shift…" autocomplete="off" spellcheck="false">
+        <input type="text" id="classic-input" data-i18n-placeholder="classic.placeholder" placeholder="Ej: copiar, VS Code, Ctrl+Shift…" autocomplete="off" spellcheck="false">
         <ul class="suggestions hidden" id="classic-suggestions"></ul>
       </div>
 
       <div class="table-wrap">
         <div class="ctable" id="classic-table">
           <div class="crow chead">
-            <div>Atajo</div><div>App</div><div>Categoría</div><div>Modificadores</div><div>Nº teclas</div><div>Tecla final</div>
+            <div data-i18n="col.shortcut">Atajo</div><div data-i18n="col.app">App</div><div data-i18n="col.cat">Categoría</div><div data-i18n="col.mods">Modificadores</div><div data-i18n="col.count">Nº teclas</div><div data-i18n="col.final">Tecla final</div>
           </div>
         </div>
       </div>
       <div class="legend">
-        <span><i class="sw sw-ok"></i>Correcto</span>
-        <span><i class="sw sw-part"></i>Parcial</span>
-        <span><i class="sw sw-bad"></i>Incorrecto</span>
-        <span>⬆️⬇️ más / menos</span>
+        <span><i class="sw sw-ok"></i><span data-i18n="legend.ok">Correcto</span></span>
+        <span><i class="sw sw-part"></i><span data-i18n="legend.part">Parcial</span></span>
+        <span><i class="sw sw-bad"></i><span data-i18n="legend.bad">Incorrecto</span></span>
+        <span data-i18n="legend.arrows">⬆️⬇️ más / menos</span>
       </div>
     </section>
 
@@ -101,14 +102,14 @@
       <p id="result-text"></p>
       <div class="result-answer" id="result-answer"></div>
       <div class="result-actions">
-        <button class="btn btn-primary" id="btn-share">📋 Compartir</button>
+        <button class="btn btn-primary" id="btn-share" data-i18n="result.share">📋 Compartir</button>
         <button class="btn btn-accent" id="btn-next">Otro reto ♾️</button>
       </div>
       <p class="countdown" id="countdown"></p>
     </section>
   </main>
 
-  <footer class="foot">
+  <footer class="foot" data-i18n="footer">
     Hecho con <span class="heart">♥</span> y muchos <kbd>Ctrl</kbd>+<kbd>Z</kbd>
   </footer>
 
@@ -116,33 +117,16 @@
   <div class="modal hidden" id="modal-help">
     <div class="modal-box card">
       <button class="modal-close" data-close>✕</button>
-      <h2>¿Cómo se juega?</h2>
-      <h3>⌨️ Combo</h3>
-      <p>Te mostramos una acción y la app donde se usa. Tienes <b>6 intentos</b> para teclear el atajo correcto.</p>
-      <div class="help-row">
-        <span class="key key-sm st-ok">Ctrl</span><span>La tecla está en el atajo.</span>
-      </div>
-      <div class="help-row">
-        <span class="key key-sm st-bad">Alt</span><span>La tecla no forma parte del atajo.</span>
-      </div>
-      <div class="help-row">
-        <span class="count-chip up">3 ⬆️</span><span>El atajo tiene más teclas que tu intento.</span>
-      </div>
-      <h3>🔎 Clásico</h3>
-      <p>Adivina un atajo misterioso. Cada intento compara la <b>app</b>, la <b>categoría</b>, los <b>modificadores</b>, el <b>número de teclas</b> y la <b>tecla final</b>.</p>
-      <p>🟨 en modificadores = comparten alguno. 🟨 en tecla final = mismo tipo (letra, número, F‑tecla, flecha…); si son letras o números, ⬆️⬇️ indica si la respuesta va después o antes.</p>
-      <h3>📅 Diario y ♾️ Práctica</h3>
-      <p>Hay un reto nuevo cada día para cada modo. En Práctica puedes jugar sin límite.</p>
-      <p class="tiny-note">Los atajos usan la convención de Windows/Linux. En Mac, <kbd>⌘</kbd> = <kbd>Ctrl</kbd> y <kbd>⌥</kbd> = <kbd>Alt</kbd>.</p>
+      <div data-i18n="help.html"></div>
     </div>
   </div>
 
   <div class="modal hidden" id="modal-stats">
     <div class="modal-box card">
       <button class="modal-close" data-close>✕</button>
-      <h2>Estadísticas <small id="stats-mode"></small></h2>
+      <h2><span data-i18n="stats.title">Estadísticas</span> <small id="stats-mode"></small></h2>
       <div class="stats-grid" id="stats-grid"></div>
-      <h3>Distribución de intentos</h3>
+      <h3 data-i18n="stats.dist">Distribución de intentos</h3>
       <div class="dist" id="stats-dist"></div>
     </div>
   </div>
@@ -151,6 +135,7 @@
   <canvas id="confetti" aria-hidden="true"></canvas>
 
   <script src="js/data.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

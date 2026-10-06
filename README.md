@@ -9,6 +9,10 @@ Un juego diario para adivinar **atajos de teclado**.
 
 Cada modo tiene un **reto diario** (igual para todo el mundo) y un modo **práctica** ilimitado. Las estadísticas y rachas se guardan en el navegador.
 
+## Idiomas
+
+El juego está en español e inglés (botón ES/EN). Los textos de la interfaz están en `js/i18n.js` y cada atajo de `js/data.js` tiene `action` (español) y `en` (inglés).
+
 ## Desarrollo
 
 Es un sitio estático sin dependencias: abre `index.html` o ejecuta
@@ -17,7 +21,7 @@ Es un sitio estático sin dependencias: abre `index.html` o ejecuta
 python3 -m http.server
 ```
 
-Los atajos están en `js/data.js`. Para añadir uno, agrega un objeto `{ app, action, keys, alt? }`.
+Los atajos están en `js/data.js`. Para añadir uno, agrega un objeto `{ app, action, en, keys, alt? }`.
 
 ## Publicación
 

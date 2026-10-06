@@ -18,6 +18,27 @@
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* sin almacenamiento */ } },
   };
 
+  // ================= Idioma =================
+  let LANG = store.get("sdle:lang", null) || ((navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en");
+  function t(key, vars = {}) {
+    const v = (I18N[LANG] && I18N[LANG][key]) ?? I18N.es[key] ?? key;
+    if (typeof v !== "string") return v;
+    if ("n" in vars) vars = { s: vars.n === 1 ? "" : "s", es: vars.n === 1 ? "" : "es", ...vars };
+    return v.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+  }
+  const actionOf = (s) => (LANG === "en" ? s.en : s.action);
+  const appName = (id) => (LANG === "en" && APPS[id].nameEn) || APPS[id].name;
+  const appCat = (id) => (LANG === "en" ? APPS[id].catEn : APPS[id].cat);
+
+  function applyStatic() {
+    document.documentElement.lang = LANG;
+    $$("[data-i18n]").forEach((el) => { el.innerHTML = t(el.dataset.i18n); });
+    $$("[data-i18n-title]").forEach((el) => { el.title = t(el.dataset.i18nTitle); el.setAttribute("aria-label", el.title); });
+    $$("[data-i18n-placeholder]").forEach((el) => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+    $$("[data-i18n-content]").forEach((el) => { el.content = t(el.dataset.i18nContent); });
+    $("#btn-lang").textContent = LANG === "es" ? "EN" : "ES";
+  }
+
   // PRNG con semilla (mulberry32)
   function rng(seed) {
     return function () {
@@ -44,19 +65,19 @@
     return mods.concat(keys.filter((k) => !isMod(k)));
   };
   const DISPLAY = {
-    Delete: "Supr", Space: "Espacio", Home: "Inicio", End: "Fin",
-    PgUp: "RePág", PgDn: "AvPág", Backspace: "⌫", PrtSc: "ImpPt",
+    es: { Delete: "Supr", Space: "Espacio", Home: "Inicio", End: "Fin", PgUp: "RePág", PgDn: "AvPág", Backspace: "⌫", PrtSc: "ImpPt" },
+    en: { Delete: "Del", Backspace: "⌫" },
   };
-  const label = (k) => DISPLAY[k] || k;
+  const label = (k) => DISPLAY[LANG][k] || k;
   const sameSet = (a, b) => a.length === b.length && a.every((k) => b.includes(k));
   const keyType = (k) => {
-    if (/^[A-Z]$/.test(k)) return "letra";
-    if (/^[0-9]$/.test(k)) return "número";
-    if (/^F\d+$/.test(k)) return "tecla F";
-    if ("↑↓←→".includes(k)) return "flecha";
-    if (isMod(k)) return "modificador";
-    if (k.length === 1) return "símbolo";
-    return "especial";
+    if (/^[A-Z]$/.test(k)) return "letter";
+    if (/^[0-9]$/.test(k)) return "number";
+    if (/^F\d+$/.test(k)) return "fkey";
+    if ("↑↓←→".includes(k)) return "arrow";
+    if (isMod(k)) return "modifier";
+    if (k.length === 1) return "symbol";
+    return "special";
   };
   const finalKey = (keys) => keys[keys.length - 1];
 
@@ -94,7 +115,7 @@
   const kbdInline = (keys) => `<span class="combo-inline">${keys.map((k) => `<kbd>${esc(label(k))}</kbd>`).join("")}</span>`;
   const appChip = (appId) => {
     const a = APPS[appId];
-    return `<span class="app-ico">${a.icon}</span>${esc(a.name)}`;
+    return `<span class="app-ico">${a.icon}</span>${esc(appName(appId))}`;
   };
 
   // ================= Fecha / reto diario =================
@@ -158,7 +179,7 @@
     $$(".switch-btn").forEach((b) => b.classList.toggle("active", b.dataset.variant === state.variant));
     $("#mode-combo").classList.toggle("hidden", state.mode !== "combo");
     $("#mode-classic").classList.toggle("hidden", state.mode !== "classic");
-    $$(".puzzle-label").forEach((el) => { el.textContent = state.variant === "daily" ? `#${TODAY}` : "♾️ Práctica"; });
+    $$(".puzzle-label").forEach((el) => { el.textContent = state.variant === "daily" ? `#${TODAY}` : t("puzzle.practice"); });
     if (state.mode === "combo") renderCombo();
     else renderClassic();
     renderResult();
@@ -177,18 +198,18 @@
     const appEl = $("#combo-app");
     appEl.innerHTML = appChip(a.app);
     appEl.style.background = app.color;
-    $("#combo-action").textContent = a.action + "?";
+    $("#combo-action").textContent = actionOf(a) + "?";
 
     // Pistas
     const fails = state.guesses.length;
     const nMods = a.keys.filter(isMod).length;
     const hints = [
-      { at: 2, text: nMods ? `🎛️ Usa ${nMods} modificador${nMods > 1 ? "es" : ""}` : "🎛️ No usa modificadores", lock: "🔒 Pista en 2 intentos" },
-      { at: 4, text: `🔑 Tecla final: ${label(finalKey(a.keys))}`, lock: "🔒 Pista en 4 intentos" },
+      { at: 2, text: nMods ? t("combo.hintMods", { n: nMods, s: nMods > 1 ? (LANG === "es" ? "es" : "s") : "" }) : t("combo.hintNoMods") },
+      { at: 4, text: t("combo.hintFinal", { k: label(finalKey(a.keys)) }) },
     ];
     $("#combo-hints").innerHTML = hints.map((x) => {
       const open = fails >= x.at || state.done;
-      return `<span class="hint ${open ? "unlocked" : ""}">${esc(open ? x.text : x.lock.replace(/\d+/, Math.max(0, x.at - fails)))}</span>`;
+      return `<span class="hint ${open ? "unlocked" : ""}">${esc(open ? x.text : t("hint.locked", { n: x.at - fails }))}</span>`;
     }).join("");
 
     // Tablero
@@ -207,7 +228,7 @@
         const diff = a.keys.length - g.length;
         const chip = h("span", "count-chip " + (diff === 0 ? "ok" : diff > 0 ? "up" : "down"),
           diff === 0 ? `${g.length} ✓` : `${a.keys.length > g.length ? "⬆️" : "⬇️"}`);
-        chip.title = diff === 0 ? "Número de teclas correcto" : diff > 0 ? "El atajo tiene más teclas" : "El atajo tiene menos teclas";
+        chip.title = t(diff === 0 ? "combo.countOk" : diff > 0 ? "combo.countUp" : "combo.countDown");
         row.appendChild(chip);
       } else {
         row.appendChild(keys);
@@ -225,7 +246,7 @@
     const st = $("#combo-staging");
     st.innerHTML = state.staged.length
       ? comboHTML(state.staged)
-      : '<span class="staging-empty">Pulsa la combinación o usa el teclado de abajo</span>';
+      : `<span class="staging-empty">${esc(t("combo.empty"))}</span>`;
     $("#combo-submit").disabled = !state.staged.length;
     $$(".vkey").forEach((b) => b.classList.toggle("selected", state.staged.includes(b.dataset.key)));
   }
@@ -248,7 +269,7 @@
     if (state.done || !state.staged.length) return;
     const g = state.staged.slice();
     if (state.guesses.some((x) => sameSet(x, g))) {
-      toast("Ya probaste esa combinación 🤔");
+      toast(t("combo.repeat"));
       shake($("#combo-staging"));
       return;
     }
@@ -295,12 +316,18 @@
         const b = h("button", "vkey" + (wide.has(k) ? " wide" : "") + (k === "Space" ? " xwide" : "") + (isMod(k) ? " mod" : ""));
         b.type = "button";
         b.dataset.key = k;
-        b.textContent = k === "Win" ? (IS_MAC ? "Win" : "⊞ Win") : label(k);
-        b.title = label(k);
         b.addEventListener("click", () => toggleStaged(k));
         row.appendChild(b);
       });
       kb.appendChild(row);
+    });
+    relabelKeyboard();
+  }
+  function relabelKeyboard() {
+    $$(".vkey").forEach((b) => {
+      const k = b.dataset.key;
+      b.textContent = k === "Win" ? (IS_MAC ? "Win" : "⊞ Win") : label(k);
+      b.title = label(k);
     });
   }
 
@@ -348,8 +375,7 @@
     const gf = finalKey(g.keys), af = finalKey(a.keys);
     let finalSt = gf === af ? "ok" : keyType(gf) === keyType(af) ? "part" : "bad";
     let finalArrow = "";
-    if (finalSt === "part" && keyType(gf) === "letra") finalArrow = af > gf ? "⬆️" : "⬇️";
-    if (finalSt === "part" && keyType(gf) === "número") finalArrow = af > gf ? "⬆️" : "⬇️";
+    if (finalSt === "part" && ["letter", "number"].includes(keyType(gf))) finalArrow = af > gf ? "⬆️" : "⬇️";
     return {
       app: g.app === a.app ? "ok" : "bad",
       cat: APPS[g.app].cat === APPS[a.app].cat ? "ok" : "bad",
@@ -365,13 +391,13 @@
     const a = state.answer;
     const n = state.guesses.length;
     const hints = [
-      { at: 4, text: `${APPS[a.app].icon} App: ${APPS[a.app].name}` },
-      { at: 8, text: `💬 Empieza por: “${a.action.split(" ")[0]}…”` },
+      { at: 4, text: `${APPS[a.app].icon} ${t("classic.hintApp", { a: appName(a.app) })}` },
+      { at: 8, text: t("classic.hintStart", { w: actionOf(a).split(" ")[0] }) },
       { at: 12, text: `🔑 ${a.keys.map(label).join(" + ")}` },
     ];
     $("#classic-hints").innerHTML = hints.map((x) => {
       const open = n >= x.at || state.done;
-      return `<span class="hint ${open ? "unlocked" : ""}">${esc(open ? x.text : `🔒 Pista en ${x.at - n} intento${x.at - n === 1 ? "" : "s"}`)}</span>`;
+      return `<span class="hint ${open ? "unlocked" : ""}">${esc(open ? x.text : t("hint.locked", { n: x.at - n }))}</span>`;
     }).join("");
 
     $("#classic-search").classList.toggle("hidden", state.done);
@@ -385,12 +411,12 @@
       const row = h("div", "crow");
       const mods = g.keys.filter(isMod);
       const cells = [
-        `<div class="cell name"><b>${esc(g.action)}</b>${kbdInline(g.keys)}</div>`,
-        `<div class="cell ${c.app}"><span class="big">${APPS[g.app].icon}</span>${esc(APPS[g.app].name)}</div>`,
-        `<div class="cell ${c.cat}">${esc(APPS[g.app].cat)}</div>`,
-        `<div class="cell ${c.mods}">${mods.length ? mods.map(label).join(" + ") : "Ninguno"}</div>`,
+        `<div class="cell name"><b>${esc(actionOf(g))}</b>${kbdInline(g.keys)}</div>`,
+        `<div class="cell ${c.app}"><span class="big">${APPS[g.app].icon}</span>${esc(appName(g.app))}</div>`,
+        `<div class="cell ${c.cat}">${esc(appCat(g.app))}</div>`,
+        `<div class="cell ${c.mods}">${mods.length ? mods.map(label).join(" + ") : t("mods.none")}</div>`,
         `<div class="cell ${c.count}"><span class="big">${g.keys.length}</span><span class="arrow">${c.countArrow}</span></div>`,
-        `<div class="cell ${c.final}"><kbd>${esc(label(finalKey(g.keys)))}</kbd><small>${esc(keyType(finalKey(g.keys)))}</small><span class="arrow">${c.finalArrow}</span></div>`,
+        `<div class="cell ${c.final}"><kbd>${esc(label(finalKey(g.keys)))}</kbd><small>${esc(t("type." + keyType(finalKey(g.keys))))}</small><span class="arrow">${c.finalArrow}</span></div>`,
       ];
       row.innerHTML = cells.join("");
       $$(".cell", row).forEach((cell, j) => {
@@ -403,7 +429,9 @@
   }
 
   function haystack(s) {
-    return norm(`${s.action} ${APPS[s.app].name} ${APPS[s.app].cat} ${s.keys.join("+")} ${s.keys.map(label).join(" ")}`);
+    const a = APPS[s.app];
+    const labels = s.keys.map((k) => [DISPLAY.es[k], DISPLAY.en[k]].filter(Boolean).join(" ")).join(" ");
+    return norm(`${s.action} ${s.en} ${a.name} ${a.nameEn || ""} ${a.cat} ${a.catEn} ${s.keys.join("+")} ${labels}`);
   }
   SHORTCUTS.forEach((s) => { s._hay = haystack(s); });
 
@@ -414,12 +442,12 @@
     if (!q) { ul.classList.add("hidden"); ul.innerHTML = ""; return; }
     const tokens = q.split(/\s+/).filter(Boolean);
     const res = SHORTCUTS.filter((s) => !state.guesses.includes(s.id) && tokens.every((t) => s._hay.includes(t)))
-      .sort((x, y) => (norm(x.action).startsWith(q) ? -1 : 0) - (norm(y.action).startsWith(q) ? -1 : 0))
+      .sort((x, y) => (norm(actionOf(x)).startsWith(q) ? -1 : 0) - (norm(actionOf(y)).startsWith(q) ? -1 : 0))
       .slice(0, 40);
     sugIndex = res.length ? 0 : -1;
     ul.innerHTML = res.length
-      ? res.map((s, i) => `<li data-id="${s.id}" class="${i === 0 ? "active" : ""}"><span class="sug-ico">${APPS[s.app].icon}</span><span class="sug-text"><b>${esc(s.action)}</b><small>${esc(APPS[s.app].name)}</small></span>${kbdInline(s.keys)}</li>`).join("")
-      : `<li style="cursor:default"><span class="sug-text"><small>Sin resultados… prueba con otra palabra</small></span></li>`;
+      ? res.map((s, i) => `<li data-id="${s.id}" class="${i === 0 ? "active" : ""}"><span class="sug-ico">${APPS[s.app].icon}</span><span class="sug-text"><b>${esc(actionOf(s))}</b><small>${esc(appName(s.app))}</small></span>${kbdInline(s.keys)}</li>`).join("")
+      : `<li style="cursor:default"><span class="sug-text"><small>${esc(t("classic.noResults"))}</small></span></li>`;
     ul.classList.remove("hidden");
   }
   function moveSug(d) {
@@ -481,18 +509,18 @@
     if (!state.done) { box.classList.add("hidden"); return; }
     box.classList.remove("hidden");
     const a = state.answer, n = state.guesses.length;
-    const winMsgs = ["¡Maestro del teclado!", "¡Dedos de oro!", "¡Combo perfecto!", "¡Lo lograste!", "¡Bien jugado!", "¡Por los pelos!"];
+    const winMsgs = t("result.wins");
     $("#result-emoji").textContent = state.won ? (n === 1 ? "🤯" : n <= 3 ? "🏆" : "🎉") : "😵";
     $("#result-title").textContent = state.won
-      ? (state.mode === "combo" ? winMsgs[Math.min(n, 6) - 1] : n <= 3 ? "¡Increíble!" : "¡Lo encontraste!")
-      : "¡Casi!";
+      ? (state.mode === "combo" ? winMsgs[Math.min(n, 6) - 1] : t(n <= 3 ? "result.classicGreat" : "result.classicWin"))
+      : t("result.lose");
     $("#result-text").textContent = state.won
-      ? `Lo resolviste en ${n} intento${n > 1 ? "s" : ""}.`
-      : "Se acabaron los intentos. La respuesta era:";
+      ? t("result.solved", { n })
+      : t("result.failed");
     $("#result-answer").innerHTML = `<span class="prompt-app" style="background:${APPS[a.app].color}">${appChip(a.app)}</span>
-      <div style="width:100%;font-weight:800;margin:4px 0">${esc(a.action)}</div>${comboHTML(a.keys, "st-ok")}`
-      + (a.alt.length ? `<div style="width:100%;color:var(--muted);font-weight:600;font-size:14px">También vale: ${a.alt.map((x) => x.map(label).join("+")).join(" · ")}</div>` : "");
-    $("#btn-next").textContent = state.variant === "daily" ? "Jugar en práctica ♾️" : "Otro reto ♾️";
+      <div style="width:100%;font-weight:800;margin:4px 0">${esc(actionOf(a))}</div>${comboHTML(a.keys, "st-ok")}`
+      + (a.alt.length ? `<div style="width:100%;color:var(--muted);font-weight:600;font-size:14px">${esc(t("result.alsoValid"))} ${a.alt.map((x) => x.map(label).join("+")).join(" · ")}</div>` : "");
+    $("#btn-next").textContent = t(state.variant === "daily" ? "result.playPractice" : "result.another");
     updateCountdown();
   }
 
@@ -503,19 +531,19 @@
     const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const s = Math.max(0, Math.floor((next - now) / 1000));
     const pad = (x) => String(x).padStart(2, "0");
-    el.textContent = `⏳ Próximo reto en ${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
+    el.textContent = t("result.countdown", { t: `${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}` });
   }
   setInterval(updateCountdown, 1000);
 
   function shareText() {
     const a = state.answer, n = state.guesses.length;
-    const tag = state.variant === "daily" ? `#${TODAY}` : "(práctica)";
+    const tag = state.variant === "daily" ? `#${TODAY}` : t("share.practice");
     let lines;
     if (state.mode === "combo") {
       lines = [`Shortcut-dle ⌨️ Combo ${tag} ${state.won ? n : "X"}/${MAX_COMBO}`];
       state.guesses.forEach((g) => lines.push(comboFeedback(g, a).map((x) => (x === "ok" ? "🟩" : "🟥")).join("")));
     } else {
-      lines = [`Shortcut-dle 🔎 Clásico ${tag} — ${n} intento${n > 1 ? "s" : ""}`];
+      lines = [`Shortcut-dle 🔎 ${t("share.classic")} ${tag} — ${t("share.tries", { n })}`];
       const em = { ok: "🟩", part: "🟨", bad: "🟥" };
       state.guesses.slice(-6).forEach((id) => {
         const c = compareClassic(SHORTCUTS[id], a);
@@ -529,10 +557,10 @@
 
   function renderStats() {
     const s = getStats(state.mode);
-    $("#stats-mode").textContent = state.mode === "combo" ? "· Combo" : "· Clásico";
+    $("#stats-mode").textContent = state.mode === "combo" ? "· Combo" : `· ${t("share.classic")}`;
     const pct = s.played ? Math.round((s.wins / s.played) * 100) : 0;
     $("#stats-grid").innerHTML = [
-      [s.played, "Jugados"], [pct + "%", "Victorias"], [s.streak, "Racha"], [s.maxStreak, "Mejor racha"],
+      [s.played, t("stats.played")], [pct + "%", t("stats.wins")], [s.streak, t("stats.streak")], [s.maxStreak, t("stats.maxStreak")],
     ].map(([v, l]) => `<div class="stat"><b>${v}</b><small>${l}</small></div>`).join("");
     const buckets = state.mode === "combo" ? ["1", "2", "3", "4", "5", "6", "✗"] : ["1", "2", "3", "4-6", "7-10", "11+"];
     const max = Math.max(1, ...buckets.map((b) => s.dist[b] || 0));
@@ -660,13 +688,21 @@
       applyTheme(t);
     });
 
+    $("#btn-lang").addEventListener("click", () => {
+      LANG = LANG === "es" ? "en" : "es";
+      store.set("sdle:lang", LANG);
+      applyStatic();
+      relabelKeyboard();
+      render();
+      if (!$("#modal-stats").classList.contains("hidden")) renderStats();
+    });
     $("#btn-share").addEventListener("click", async () => {
       const text = shareText();
       try {
         if (navigator.share && matchMedia("(pointer: coarse)").matches) await navigator.share({ text });
-        else { await navigator.clipboard.writeText(text); toast("¡Resultado copiado! 📋"); }
+        else { await navigator.clipboard.writeText(text); toast(t("toast.copied")); }
       } catch {
-        toast("No se pudo copiar 😢");
+        toast(t("toast.copyFail"));
       }
     });
     $("#btn-next").addEventListener("click", () => {
@@ -677,6 +713,7 @@
   }
 
   // ================= Inicio =================
+  applyStatic();
   applyTheme(store.get("sdle:theme", null));
   floatingKeys();
   buildKeyboard();
